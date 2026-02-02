@@ -1,5 +1,6 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
+    "name": "neuroleaf",
     "framework": "nextjs",
     "buildCommand": "npm run build",
     "outputDirectory": ".next",

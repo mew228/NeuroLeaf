@@ -18,8 +18,11 @@ export const metadata: Metadata = {
   description: "Your safe space for emotional tracking, journaling, and AI-powered self-reflection.",
   manifest: "/manifest.json",
   icons: {
-    icon: "/icon.png",
-    shortcut: "/icon.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
   appleWebApp: {
