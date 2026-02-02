@@ -1,0 +1,42 @@
+# Render Blueprint for NeuroLeaf Backend
+# Deploy with: render.com -> New -> Blueprint -> Connect Repo
+
+services:
+  # FastAPI Backend
+  - type: web
+    name: neuroleaf-api
+    runtime: python
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: neuroleaf-db
+          property: connectionString
+      - key: OPENAI_API_KEY
+        sync: false  # Set manually in dashboard
+      - key: ALLOWED_ORIGINS
+        value: https://neuroleaf.vercel.app,https://neuroleaf-*.vercel.app
+      - key: REDIS_URL
+        sync: false  # Optional: Set if using Upstash
+      - key: SENTRY_DSN
+        sync: false  # Optional: Set if using Sentry
+
+databases:
+  - name: neuroleaf-db
+    plan: free
+    region: oregon
+    postgresMajorVersion: 15
+    databaseName: neuroleaf_db
+    user: neuroleaf_user
