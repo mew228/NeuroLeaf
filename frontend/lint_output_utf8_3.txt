@@ -1,0 +1,22 @@
+﻿
+> frontend@0.1.0 lint
+> eslint
+
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\analytics\page.tsx
+  46:86  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\dashboard\page.tsx
+  99:86  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\login\page.tsx
+  27:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\register\page.tsx
+  33:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\context\AuthContext.tsx
+  31:23  warning  'setIsLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 5 problems (4 errors, 1 warning)
+

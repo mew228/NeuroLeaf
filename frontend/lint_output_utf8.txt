@@ -1,0 +1,136 @@
+﻿
+> frontend@0.1.0 lint
+> eslint
+
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\analytics\page.tsx
+    7:5    warning  'ChevronRight' is defined but never used                         @typescript-eslint/no-unused-vars
+   25:12   warning  'loading' is assigned a value but never used                     @typescript-eslint/no-unused-vars
+   46:56   error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  144:29   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  144:122  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  159:29   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  159:125  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\crisis\page.tsx
+    5:10   warning  'LifeBuoy' is defined but never used                             @typescript-eslint/no-unused-vars
+    5:27   warning  'Globe' is defined but never used                                @typescript-eslint/no-unused-vars
+    5:34   warning  'MessageSquare' is defined but never used                        @typescript-eslint/no-unused-vars
+    5:62   warning  'ShieldAlert' is defined but never used                          @typescript-eslint/no-unused-vars
+   11:12   warning  'loading' is assigned a value but never used                     @typescript-eslint/no-unused-vars
+   43:31   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+   43:51   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  114:21   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  114:35   error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  114:118  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  114:145  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  114:146  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\dashboard\page.tsx
+   12:5   warning  'BrainCircuit' is defined but never used                         @typescript-eslint/no-unused-vars
+   22:5   warning  'YAxis' is defined but never used                                @typescript-eslint/no-unused-vars
+   37:12  warning  'loading' is assigned a value but never used                     @typescript-eslint/no-unused-vars
+  100:56  error    Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  128:63  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  208:33  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  208:75  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  208:85  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\journal\[id]\page.tsx
+   27:8   warning  React Hook useEffect has a missing dependency: 'fetchEntry'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  113:33  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                react/no-unescaped-entities
+  113:58  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                react/no-unescaped-entities
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\journal\page.tsx
+    7:5   warning  'ChevronRight' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+   18:8   warning  'Link' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+   36:8   warning  React Hook useEffect has a missing dependency: 'fetchEntries'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  205:45  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                  react/no-unescaped-entities
+  205:70  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                  react/no-unescaped-entities
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\login\page.tsx
+   26:23  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  139:28  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\mood\page.tsx
+  5:10  warning  'Smile' is defined but never used  @typescript-eslint/no-unused-vars
+  5:17  warning  'Meh' is defined but never used    @typescript-eslint/no-unused-vars
+  5:22  warning  'Frown' is defined but never used  @typescript-eslint/no-unused-vars
+  5:41  warning  'Save' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\app\register\page.tsx
+   4:10  warning  'useAuth' is defined but never used       @typescript-eslint/no-unused-vars
+   7:59  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+  32:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\components\common\Sidebar.tsx
+  12:13  warning  'UserIcon' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\components\mood\MoodEntry.tsx
+  4:10  warning  'motion' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\context\AuthContext.tsx
+  29:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\context\AuthContext.tsx:29:13
+  27 |
+  28 |         if (storedUser && storedToken) {
+> 29 |             setUser(JSON.parse(storedUser));
+     |             ^^^^^^^ Avoid calling setState() directly within an effect
+  30 |             setToken(storedToken);
+  31 |         }
+  32 |         setIsLoading(false);  react-hooks/set-state-in-effect
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\context\ThemeContext.tsx
+  20:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\context\ThemeContext.tsx:20:13
+  18 |         const savedTheme = localStorage.getItem('neuroleaf_theme') as Theme;
+  19 |         if (savedTheme) {
+> 20 |             setTheme(savedTheme);
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  21 |             document.documentElement.setAttribute('data-theme', savedTheme);
+  22 |             if (savedTheme === 'dark') {
+  23 |                 document.documentElement.classList.add('dark');  react-hooks/set-state-in-effect
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\context\ToastContext.tsx
+  30:13  error  Error: Cannot access variable before it is declared
+
+`removeToast` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\context\ToastContext.tsx:30:13
+  28 |
+  29 |         setTimeout(() => {
+> 30 |             removeToast(id);
+     |             ^^^^^^^^^^^ `removeToast` accessed before it is declared
+  31 |         }, 5000);
+  32 |     }, []);
+  33 |
+
+C:\Users\MAHARSHI NATH\OneDrive\Documents\NeuroLeaf\frontend\context\ToastContext.tsx:34:5
+  32 |     }, []);
+  33 |
+> 34 |     const removeToast = (id: string) => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |         setToasts((prev) => prev.filter((toast) => toast.id !== id));
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 36 |     };
+     | ^^^^^^^ `removeToast` is declared here
+  37 |
+  38 |     return (
+  39 |         <ToastContext.Provider value={{ showToast }}>  react-hooks/immutability
+
+✖ 49 problems (27 errors, 22 warnings)
+
