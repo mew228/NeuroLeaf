@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Pip outdated
+pip-selfcheck.json
+
+# ChromaDB vector store
+chroma_data/
+
 # Virtual environment
 venv/
 env/
