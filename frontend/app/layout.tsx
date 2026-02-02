@@ -17,14 +17,6 @@ export const metadata: Metadata = {
   title: "NeuroLeaf | AI Mental Health Companion",
   description: "Your safe space for emotional tracking, journaling, and AI-powered self-reflection.",
   manifest: "/manifest.json",
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/icon.png", type: "image/png" },
-    ],
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
