@@ -11,7 +11,9 @@ import {
     PenTool,
     Calendar,
     ArrowRight,
-    Maximize
+    Maximize,
+    Mic,
+    StopCircle
 } from 'lucide-react';
 import api from '../../lib/api';
 import { AIAnalysis, JournalEntry } from '../../lib/types';
@@ -33,6 +35,12 @@ const JournalPage = () => {
     const [loadingEntries, setLoadingEntries] = useState(false);
     const [focusModeOpen, setFocusModeOpen] = useState(false);
 
+    // Voice Journaling State
+    const [isRecording, setIsRecording] = useState(false);
+    const [transcribing, setTranscribing] = useState(false);
+    const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+    const audioChunksRef = React.useRef<Blob[]>([]);
+
     useEffect(() => {
         if (view === 'history') {
             fetchEntries();
@@ -53,10 +61,69 @@ const JournalPage = () => {
         }
     };
 
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            audioChunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType });
+                await sendAudioToBackend(audioBlob);
+                // Stop all tracks to release the microphone
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+            showToast('Voice Neural Sync Active...', 'info');
+        } catch (err) {
+            console.error('Failed to start recording', err);
+            showToast('Microphone access denied', 'error');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+        }
+    };
+
+    const sendAudioToBackend = async (blob: Blob) => {
+        setTranscribing(true);
+        try {
+            const formData = new FormData();
+            const ext = blob.type.includes('webm') ? 'webm' : 'wav';
+            formData.append('file', blob, `voice_entry.${ext}`);
+
+            const res = await api.post('/journal/transcribe', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            const text = res.data.text;
+            if (text) {
+                setContent(prev => prev ? `${prev}\n\n${text}` : text);
+                showToast('Neural transcription complete', 'success');
+            }
+        } catch (err) {
+            console.error('Failed to transcribe audio', err);
+            showToast('Transcription failed', 'error');
+        } finally {
+            setTranscribing(false);
+        }
+    };
+
     const handleSave = async () => {
         if (!title || !content) return;
         setSaving(true);
-        // showToast('Syncing to neural cache...', 'info'); // Optional, might be too noisy if button spins
         try {
             const entryRes = await api.post('/journal/entry', {
                 title,
@@ -176,10 +243,28 @@ const JournalPage = () => {
                                 </div>
                             </div>
 
-                            <div className="flex justify-end">
+                            <div className="flex justify-end gap-4">
+                                <button
+                                    onClick={isRecording ? stopRecording : startRecording}
+                                    disabled={transcribing || saving}
+                                    className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-black transition-all active:scale-95 shadow-xl ${isRecording
+                                        ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/30 animate-pulse'
+                                        : 'bg-white/5 hover:bg-emerald-500/10 text-muted-foreground hover:text-emerald-400 border border-white/5 hover:border-emerald-500/20 shadow-black/20'
+                                        }`}
+                                >
+                                    {transcribing ? (
+                                        <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                                    ) : isRecording ? (
+                                        <StopCircle className="w-5 h-5" />
+                                    ) : (
+                                        <Mic className="w-5 h-5" />
+                                    )}
+                                    {transcribing ? 'Transcribing...' : isRecording ? 'Stop Sync' : 'Voice Journal'}
+                                </button>
+
                                 <button
                                     onClick={handleSave}
-                                    disabled={saving || !title || !content}
+                                    disabled={saving || !title || !content || isRecording}
                                     className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-8 py-4 rounded-2xl font-black transition-all active:scale-95 shadow-xl shadow-emerald-500/30"
                                 >
                                     {saving ? (
@@ -355,6 +440,10 @@ const JournalPage = () => {
                 onContentChange={setContent}
                 onSubmit={handleSave}
                 isSubmitting={saving}
+                isRecording={isRecording}
+                onStartRecording={startRecording}
+                onStopRecording={stopRecording}
+                transcribing={transcribing}
             />
         </div>
     );

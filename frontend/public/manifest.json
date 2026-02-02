@@ -1,0 +1,111 @@
+{
+    "name": "NeuroLeaf",
+    "short_name": "NeuroLeaf",
+    "description": "AI-Powered Mental Wellness Companion - Track your mood, journal your thoughts, and gain neural insights.",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#030712",
+    "theme_color": "#10b981",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "/icons/icon-72x72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-128x128.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-144x144.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-152x152.png",
+            "sizes": "152x152",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png",
+            "purpose": "maskable any"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshots/dashboard.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Dashboard showing mood trends and neural insights"
+        },
+        {
+            "src": "/screenshots/journal.png",
+            "sizes": "390x844",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Voice journaling with AI analysis"
+        }
+    ],
+    "categories": [
+        "health",
+        "lifestyle",
+        "productivity"
+    ],
+    "lang": "en-US",
+    "dir": "ltr",
+    "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "Log Mood",
+            "short_name": "Mood",
+            "description": "Quick mood check-in",
+            "url": "/mood",
+            "icons": [
+                {
+                    "src": "/icons/mood-shortcut.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "New Journal Entry",
+            "short_name": "Journal",
+            "description": "Write a new journal entry",
+            "url": "/journal",
+            "icons": [
+                {
+                    "src": "/icons/journal-shortcut.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ]
+}

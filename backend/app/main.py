@@ -5,6 +5,23 @@ from app.api.v1 import api_router
 
 settings = get_settings()
 
+# Initialize Sentry for error tracking
+if settings.SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.fastapi import FastApiIntegration
+    from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+    
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        integrations=[
+            FastApiIntegration(transaction_style="endpoint"),
+            SqlalchemyIntegration(),
+        ],
+        traces_sample_rate=0.1,  # 10% of requests for performance monitoring
+        profiles_sample_rate=0.1,
+        environment=settings.ENV,
+    )
+
 app = FastAPI(
     title="NeuroLeaf API",
     description="AI-Powered Mental Wellness Companion - Ethical, Privacy-First Journaling & Mood Tracking",

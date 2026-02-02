@@ -19,6 +19,15 @@ class Settings(BaseSettings):
     # OpenAI
     OPENAI_API_KEY: str
     
+    # Redis (Caching & Celery)
+    REDIS_URL: str = "redis://localhost:6379/0"
+    
+    # Observability
+    SENTRY_DSN: str = ""
+    
+    # Encryption
+    ENCRYPTION_MASTER_KEY: str = ""
+    
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000"
     

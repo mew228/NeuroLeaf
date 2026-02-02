@@ -1,13 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, File, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc, func
 from datetime import datetime
+import os
+import tempfile
 from app.database import get_db
 from app.models.user import User
 from app.models.journal import JournalEntry
 from app.models.analysis import AIAnalysis
 from app.schemas.journal import JournalEntryCreate, JournalEntryResponse, JournalListResponse
 from app.middleware.auth import get_current_user
+from app.ml import stt_service
 
 router = APIRouter(prefix="/journal", tags=["Journal"])
 
@@ -127,3 +130,43 @@ async def get_journal_entry(
     response.has_analysis = has_analysis
     
     return response
+
+
+@router.post("/transcribe", response_model=dict)
+async def transcribe_audio(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Transcribe audio file to text."""
+    # Validate file extension (basic check)
+    allowed_extensions = {'.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm'}
+    _, ext = os.path.splitext(file.filename)
+    if ext.lower() not in allowed_extensions:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported file format. Allowed: {allowed_extensions}"
+        )
+    
+    # Save uploaded file to a temporary location
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_audio:
+            content = await file.read()
+            temp_audio.write(content)
+            temp_path = temp_audio.name
+            
+        # Transcribe using service
+        transcription = stt_service.transcribe(temp_path)
+        
+        # Cleanup
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+            
+        return {"text": transcription}
+        
+    except Exception as e:
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Transcription failed: {str(e)}"
+        )

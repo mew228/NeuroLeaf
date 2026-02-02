@@ -2,7 +2,7 @@
 
 import React, { useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Maximize, Type } from 'lucide-react';
+import { X, Maximize, Type, Mic, StopCircle } from 'lucide-react';
 
 interface FocusModeProps {
     isOpen: boolean;
@@ -13,6 +13,10 @@ interface FocusModeProps {
     onContentChange: (value: string) => void;
     onSubmit: () => void;
     isSubmitting?: boolean;
+    isRecording?: boolean;
+    onStartRecording?: () => void;
+    onStopRecording?: () => void;
+    transcribing?: boolean;
 }
 
 const FocusMode: React.FC<FocusModeProps> = ({
@@ -24,6 +28,10 @@ const FocusMode: React.FC<FocusModeProps> = ({
     onContentChange,
     onSubmit,
     isSubmitting = false,
+    isRecording = false,
+    onStartRecording,
+    onStopRecording,
+    transcribing = false,
 }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -97,24 +105,6 @@ const FocusMode: React.FC<FocusModeProps> = ({
                         ))}
                     </div>
 
-                    {/* Floating glow */}
-                    <motion.div
-                        className="absolute w-[600px] h-[600px] rounded-full pointer-events-none"
-                        style={{
-                            background: 'radial-gradient(circle, hsla(158, 95%, 55%, 0.05) 0%, transparent 70%)',
-                            filter: 'blur(80px)',
-                        }}
-                        animate={{
-                            scale: [1, 1.1, 1],
-                            opacity: [0.3, 0.5, 0.3],
-                        }}
-                        transition={{
-                            duration: 8,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                        }}
-                    />
-
                     {/* Content */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -156,7 +146,7 @@ const FocusMode: React.FC<FocusModeProps> = ({
 
                             <textarea
                                 ref={textareaRef}
-                                placeholder="Let your mind wander into the void. Write freely; judgment does not exist here..."
+                                placeholder="Let your mind wander into the void..."
                                 value={content}
                                 onChange={(e) => onContentChange(e.target.value)}
                                 className="w-full bg-transparent px-8 py-6 text-lg md:text-xl font-medium leading-relaxed border-none focus:outline-none resize-none placeholder:text-muted-foreground/30 text-foreground/80 min-h-[300px] md:min-h-[400px]"
@@ -173,9 +163,18 @@ const FocusMode: React.FC<FocusModeProps> = ({
                                 </div>
 
                                 <div className="flex items-center gap-4">
-                                    <span className="text-[10px] text-muted-foreground/50 uppercase tracking-widest hidden md:block">
-                                        Ctrl+Enter to sync
-                                    </span>
+                                    <button
+                                        onClick={isRecording ? onStopRecording : onStartRecording}
+                                        className={`p-3 rounded-xl transition-all ${isRecording ? 'bg-rose-500 text-white animate-pulse' : 'bg-white/5 text-muted-foreground hover:text-emerald-400'}`}
+                                    >
+                                        {transcribing ? (
+                                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                        ) : isRecording ? (
+                                            <StopCircle className="w-4 h-4" />
+                                        ) : (
+                                            <Mic className="w-4 h-4" />
+                                        )}
+                                    </button>
                                     <motion.button
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
