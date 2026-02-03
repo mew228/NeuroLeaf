@@ -43,6 +43,16 @@ class Settings(BaseSettings):
         """Convert comma-separated origins to list."""
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
 
+    @property
+    def async_database_url(self) -> str:
+        """Convert postgres:// to postgresql+asyncpg:// for SQLAlchemy async."""
+        url = self.DATABASE_URL
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://") and not url.startswith("postgresql+asyncpg://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return url
+
 
 @lru_cache()
 def get_settings() -> Settings:

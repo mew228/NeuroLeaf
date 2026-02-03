@@ -12,9 +12,7 @@ alembic==1.13.1
 python-dotenv==1.0.0
 gunicorn==21.2.0
 
-# AI/ML
-transformers==4.36.2
-torch==2.1.2
+# AI/ML (Using External APIs)
 openai==1.7.2
 vaderSentiment==3.3.2
 textblob==0.17.1

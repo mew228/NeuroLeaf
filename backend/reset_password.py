@@ -1,31 +1,45 @@
 import asyncio
-from sqlalchemy.ext.asyncio import create_async_engine
+import os
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
+from dotenv import load_dotenv
 from passlib.context import CryptContext
 
-DATABASE_URL = "postgresql+asyncpg://neuroleaf_user:neuroleaf2026@localhost:5432/neuroleaf_db"
-EMAIL = "mewmaharshi288@gmail.com"
-NEW_PASSWORD = "NeuroLeaf2026!"
+# Load environment variables
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL")
 
+# Security setup (matching your app's config)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-async def reset_password():
-    password_hash = pwd_context.hash(NEW_PASSWORD)
-    engine = create_async_engine(DATABASE_URL)
+async def reset_user_password(email: str, new_password: str):
+    # Ensure we use the async driver
+    if DATABASE_URL.startswith("postgresql://"):
+        url = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+    else:
+        url = DATABASE_URL
+
+    engine = create_async_engine(url)
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     
-    async with engine.connect() as conn:
-        result = await conn.execute(
-            text("UPDATE users SET password_hash = :hash WHERE email = :email"),
-            {"hash": password_hash, "email": EMAIL}
-        )
-        await conn.commit()
+    hashed_password = pwd_context.hash(new_password)
+    
+    async with async_session() as session:
+        # Update the password for the specific email
+        query = text("UPDATE users SET hashed_password = :password WHERE email = :email")
+        result = await session.execute(query, {"password": hashed_password, "email": email})
+        await session.commit()
         
         if result.rowcount > 0:
-            print(f"Successfully reset password for {EMAIL}")
+            print(f"✅ Success! Password for {email} has been reset.")
+            print(f"🔑 Your new temporary password is: {new_password}")
         else:
-            print(f"User {EMAIL} not found.")
-            
+            print(f"❌ Error: User with email {email} not found in the database.")
+    
     await engine.dispose()
 
 if __name__ == "__main__":
-    asyncio.run(reset_password())
+    target_email = "mewmaharshi288@gmail.com"
+    temp_password = "NeuroLeaf2026!"
+    asyncio.run(reset_user_password(target_email, temp_password))
