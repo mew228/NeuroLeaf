@@ -29,7 +29,7 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
         };
     }, [pathname]);
 
-    const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/';
+    const isAuthPage = false; // Always show layout components
 
     if (isLoading) {
         return (

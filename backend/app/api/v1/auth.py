@@ -15,32 +15,43 @@ settings = get_settings()
 @router.post("/register", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
     """Register a new user."""
-    # Check if user already exists
-    result = await db.execute(select(User).where(User.email == user_data.email))
-    existing_user = result.scalar_one_or_none()
-    
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
+    try:
+        # Check if user already exists
+        result = await db.execute(select(User).where(User.email == user_data.email))
+        existing_user = result.scalar_one_or_none()
+        
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
+        
+        # Create new user
+        new_user = User(
+            email=user_data.email,
+            full_name=user_data.full_name,
+            password_hash=hash_password(user_data.password)
         )
-    
-    # Create new user
-    new_user = User(
-        email=user_data.email,
-        full_name=user_data.full_name,
-        password_hash=hash_password(user_data.password)
-    )
-    
-    db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
-    
-    return {
-        "user_id": str(new_user.id),
-        "email": new_user.email,
-        "message": "Registration successful"
-    }
+        
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+        
+        return {
+            "user_id": str(new_user.id),
+            "email": new_user.email,
+            "message": "Registration successful"
+        }
+    except Exception as e:
+        import traceback
+        print(f"REGISTRATION ERROR: {str(e)}")
+        print(traceback.format_exc())
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Registration failed: {str(e)}"
+        )
 
 
 @router.post("/login", response_model=Token)

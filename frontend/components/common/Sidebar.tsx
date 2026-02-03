@@ -77,7 +77,7 @@ const Sidebar = () => {
                 </nav>
 
                 {/* Bottom Section */}
-                <div className="p-6 mt-auto space-y-6">
+                <div className="p-6 mt-auto">
                     <div className="bg-emerald-50/50 dark:bg-emerald-900/10 rounded-3xl p-5 border border-emerald-500/5 flex flex-col gap-4">
                         <div className="flex items-center gap-4 px-1">
                             <div className="w-12 h-12 bg-gradient-to-tr from-emerald-100 to-emerald-200 dark:from-emerald-800 dark:to-emerald-900 rounded-2xl flex items-center justify-center text-emerald-700 dark:text-emerald-300 font-black text-sm shadow-inner overflow-hidden border border-emerald-500/10">
@@ -87,19 +87,11 @@ const Sidebar = () => {
                                 <span className="text-sm font-black truncate text-foreground leading-tight">{user.full_name}</span>
                                 <div className="flex items-center gap-2 mt-1">
                                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest">Free Plan</span>
+                                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest">Global Guest</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <button
-                        onClick={logout}
-                        className="flex w-full items-center gap-4 px-6 py-4 text-muted-foreground hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-2xl transition-all duration-300 font-bold text-sm group"
-                    >
-                        <LogOut className="w-5 h-5 opacity-70 group-hover:opacity-100 group-hover:-translate-x-1 transition-all" />
-                        <span>Sign Out</span>
-                    </button>
                 </div>
             </div>
         </div>

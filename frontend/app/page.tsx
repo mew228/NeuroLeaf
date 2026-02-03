@@ -12,10 +12,9 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && user) {
-      router.push('/dashboard');
-    }
-  }, [user, isLoading, router]);
+    // Automatically redirect to dashboard for everyone
+    router.push('/dashboard');
+  }, [router]);
 
   if (isLoading) return null;
 

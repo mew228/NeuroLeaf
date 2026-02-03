@@ -18,15 +18,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(() => {
         if (typeof window !== 'undefined') {
             const stored = localStorage.getItem('neuroleaf_user');
-            return stored ? JSON.parse(stored) : null;
+            if (stored) return JSON.parse(stored);
         }
-        return null;
+        // Default to a guest user if none exists
+        return {
+            id: '00000000-0000-0000-0000-000000000000',
+            email: 'guest@neuroleaf.com',
+            full_name: 'Guest User',
+            created_at: new Date().toISOString(),
+            is_active: true
+        };
     });
     const [token, setToken] = useState<string | null>(() => {
         if (typeof window !== 'undefined') {
-            return localStorage.getItem('neuroleaf_token');
+            return localStorage.getItem('neuroleaf_token') || 'guest-token';
         }
-        return null;
+        return 'guest-token';
     });
     const [isLoading] = useState(false);
     const router = useRouter();
@@ -48,7 +55,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(null);
         localStorage.removeItem('neuroleaf_user');
         localStorage.removeItem('neuroleaf_token');
-        router.push('/login');
+        // Stay on current page or go back to dashboard
+        router.push('/dashboard');
     }, [router]);
 
     return (
