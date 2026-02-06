@@ -13,14 +13,24 @@ import 'nprogress/nprogress.css';
 
 NProgress.configure({ showSpinner: false, speed: 400 });
 
+import NameEntryModal from '../features/NameEntryModal';
+
 const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
-    const { user, isLoading } = useAuth();
+    const { user, updateName, isLoading } = useAuth();
     const pathname = usePathname();
     const [mounted, setMounted] = React.useState(false);
+    const [showNameModal, setShowNameModal] = React.useState(false);
 
     React.useEffect(() => {
         setMounted(true);
     }, []);
+
+    React.useEffect(() => {
+        // Trigger modal if mounted and no user (or guest user with no name set yet)
+        if (mounted && !user) {
+            setShowNameModal(true);
+        }
+    }, [mounted, user]);
 
     React.useEffect(() => {
         NProgress.done();
@@ -28,6 +38,13 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
             NProgress.start();
         };
     }, [pathname]);
+
+    const handleNameComplete = (name: string) => {
+        if (updateName) {
+            updateName(name);
+        }
+        setShowNameModal(false);
+    };
 
     const isAuthPage = false; // Always show layout components
 
@@ -45,14 +62,19 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
         <AuraBackground mood="calm">
             <div className="flex min-h-screen relative selection:bg-emerald-500 selection:text-white">
 
+                {/* Name Entry Modal */}
+                {showNameModal && (
+                    <NameEntryModal onComplete={handleNameComplete} />
+                )}
+
                 {!isAuthPage && mounted && user && (
-                    <div className="hidden lg:block w-72 h-screen sticky top-0 z-10">
+                    <div className="hidden lg:block w-64 h-full sticky top-0 z-10">
                         <Sidebar />
                     </div>
                 )}
 
                 <main className="flex-1 flex flex-col min-w-0 relative z-10">
-                    <div className="flex-1 px-4 py-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full pb-28 lg:pb-12">
+                    <div className="flex-1 px-4 py-6 md:p-8 max-w-screen-2xl mx-auto w-full pb-28 lg:pb-8">
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={pathname}
@@ -75,16 +97,16 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                             className="lg:hidden fixed bottom-0 left-0 right-0 z-50 pb-safe"
                         >
                             <div className="mx-4 mb-4">
-                                <nav className="glass py-2 px-6 rounded-[2.5rem] flex items-center justify-between shadow-2xl shadow-emerald-900/20 border border-emerald-500/10 relative">
+                                <nav className="glass py-2 px-6 rounded-2xl flex items-center justify-between shadow-2xl shadow-emerald-900/20 border border-emerald-500/10 relative">
                                     {/* Left Side */}
                                     <div className="flex items-center gap-6">
                                         <Link href="/dashboard" className="flex flex-col items-center gap-1 group">
-                                            <div className={`p-2.5 rounded-2xl transition-all ${pathname === '/dashboard' ? 'text-emerald-400' : 'text-muted-foreground'}`}>
+                                            <div className={`p-2.5 rounded-2xl transition-all ${pathname === '/dashboard' ? 'text-emerald-400' : 'text-emerald-500/50'}`}>
                                                 <Home className="w-6 h-6" />
                                             </div>
                                         </Link>
                                         <Link href="/analytics" className="flex flex-col items-center gap-1 group">
-                                            <div className={`p-2.5 rounded-2xl transition-all ${pathname === '/analytics' ? 'text-emerald-400' : 'text-muted-foreground'}`}>
+                                            <div className={`p-2.5 rounded-2xl transition-all ${pathname === '/analytics' ? 'text-emerald-400' : 'text-emerald-500/50'}`}>
                                                 <BarChart2 className="w-6 h-6" />
                                             </div>
                                         </Link>
@@ -105,12 +127,12 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                                     {/* Right Side */}
                                     <div className="flex items-center gap-6">
                                         <Link href="/journal" className="flex flex-col items-center gap-1 group">
-                                            <div className={`p-2.5 rounded-2xl transition-all ${pathname === '/journal' ? 'text-emerald-400' : 'text-muted-foreground'}`}>
+                                            <div className={`p-2.5 rounded-2xl transition-all ${pathname === '/journal' ? 'text-emerald-400' : 'text-emerald-500/50'}`}>
                                                 <BookOpen className="w-6 h-6" />
                                             </div>
                                         </Link>
                                         <Link href="/crisis" className="flex flex-col items-center gap-1 group">
-                                            <div className={`p-2.5 rounded-2xl transition-all ${pathname === '/crisis' ? 'text-emerald-400' : 'text-muted-foreground'}`}>
+                                            <div className={`p-2.5 rounded-2xl transition-all ${pathname === '/crisis' ? 'text-emerald-400' : 'text-emerald-500/50'}`}>
                                                 <LifeBuoy className="w-6 h-6" />
                                             </div>
                                         </Link>
