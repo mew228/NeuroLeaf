@@ -10,7 +10,10 @@ import {
     ChevronRight,
     PlusCircle,
     Sparkles,
-    BookOpen
+    BookOpen,
+    Brain,
+    Activity,
+    ArrowUpRight
 } from 'lucide-react';
 import Link from 'next/link';
 import api from '../../lib/api';
@@ -83,7 +86,7 @@ const Dashboard = () => {
             opacity: 1,
             transition: {
                 staggerChildren: 0.1,
-                delayChildren: 0.2
+                delayChildren: 0.1
             }
         }
     };
@@ -94,21 +97,20 @@ const Dashboard = () => {
             opacity: 1,
             y: 0,
             scale: 1,
-            transition: { type: 'spring', stiffness: 100, damping: 15 }
+            transition: { type: 'spring', stiffness: 100, damping: 20 }
         }
     };
 
-    const firstName = user?.full_name?.split(' ')?.[0] || 'there';
-
+    const firstName = user?.full_name?.split(' ')?.[0] || 'Traveler';
 
     // Custom Tooltip for Chart
     const CustomTooltip = ({ active, payload, label }: { active?: boolean, payload?: { value: number }[], label?: string }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white/90 dark:bg-emerald-950/90 backdrop-blur-md p-4 rounded-2xl border border-border shadow-xl">
-                    <p className="font-black text-sm mb-1">{label}</p>
-                    <p className="text-emerald-600 font-bold text-xs">
-                        {payload[0].value} Entries
+                <div className="bg-white/90 dark:bg-emerald-950/90 backdrop-blur-md p-4 rounded-xl border border-emerald-500/10 shadow-xl ring-1 ring-emerald-500/10">
+                    <p className="font-black text-[10px] uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1">{label}</p>
+                    <p className="text-foreground font-bold text-lg leading-none">
+                        {payload[0].value} <span className="text-xs font-medium text-muted-foreground ml-1">Entries</span>
                     </p>
                 </div>
             );
@@ -118,234 +120,220 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <div className="space-y-10 pb-24 md:pb-0 animate-pulse">
-                <div className="h-20 w-3/4 bg-white/5 rounded-3xl mb-12" />
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="h-40 bg-white/5 rounded-3xl" />
-                    <div className="h-40 bg-white/5 rounded-3xl" />
-                    <div className="h-40 bg-white/5 rounded-3xl" />
-                </div>
-                <div className="h-64 bg-white/5 rounded-[2.5rem]" />
-                <div className="space-y-4">
-                    <div className="h-10 w-48 bg-white/5 rounded-full" />
-                    <div className="h-24 bg-white/5 rounded-[2rem]" />
-                    <div className="h-24 bg-white/5 rounded-[2rem]" />
+            <div className="h-full flex items-center justify-center min-h-[60vh]">
+                <div className="relative">
+                    <div className="w-16 h-16 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-10 pb-24 md:pb-0">
-            {/* ... (Hero Section) ... */}
-            <div className="relative pt-2">
+        <div className="space-y-12 pb-24">
+            {/* Header Section */}
+            <div className="relative flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <motion.div
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6 }}
+                    className="space-y-2 max-w-2xl"
                 >
-                    <h1 className="text-4xl md:text-6xl font-black tracking-tight text-foreground leading-[1.1]">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-2">
+                        <Brain className="w-3 h-3" />
+                        Cognitive State: Active
+                    </div>
+                    <h1 className="text-5xl lg:text-7xl font-black tracking-tighter text-foreground leading-[0.9]">
                         Good day, <br />
-                        <span className="text-gradient"> {firstName}.</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-br from-emerald-500 to-teal-600"> {firstName}.</span>
                     </h1>
-                    <p className="text-lg text-muted-foreground mt-4 font-medium max-w-lg">
-                        Let&apos;s explore your journey today.
-                    </p>
                 </motion.div>
 
-                <div className="absolute top-0 right-0 hidden lg:block">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                >
                     <Link
                         href="/journal"
-                        className="group flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-4 rounded-2xl font-black text-sm shadow-lg shadow-emerald-500/20 transition-all hover:-translate-y-0.5 active:scale-95"
+                        className="group flex items-center gap-3 bg-foreground text-background hover:bg-emerald-600 hover:text-white px-8 py-5 rounded-[2rem] font-black text-sm transition-all hover:scale-105 active:scale-95 shadow-xl shadow-emerald-900/5 hover:shadow-emerald-500/20"
                     >
                         <PlusCircle className="w-5 h-5" />
-                        Create New Entry
+                        <span>Log Session</span>
                     </Link>
-                </div>
+                </motion.div>
             </div>
 
+            {/* Dashboard Grid */}
             <motion.div
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start"
             >
-                {/* Latest Mood */}
-                <motion.div variants={item} className="glass-card gpu-accelerated p-6 rounded-3xl premium-shadow group border-l-4 border-l-emerald-500">
-                    {/* ... (Same Content) ... */}
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center dark:bg-emerald-500/10 dark:text-emerald-400">
-                            <TrendingUp className="w-5 h-5" />
-                        </div>
-                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Latest State</span>
-                    </div>
+                {/* 1. Latest State - Large Card (4 cols) */}
+                <motion.div variants={item} className="md:col-span-4 h-full">
+                    <div className="glass h-full p-8 rounded-[2.5rem] relative overflow-hidden group hover:bg-emerald-500/5 transition-colors border border-emerald-500/10">
+                        {/* Decorative Background */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-emerald-500/20" />
 
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-3">
-                            <span className="text-4xl">{stats.latestMood?.mood_emoji || '—'}</span>
-                            <span className="text-2xl font-black text-foreground capitalize tracking-tight">
-                                {stats.latestMood?.mood_label || 'Quiescent'}
-                            </span>
-                        </div>
-                        <p className="text-muted-foreground font-bold text-[11px] tracking-tight flex items-center gap-2">
-                            <Calendar className="w-3 h-3 opacity-50" />
-                            {stats.latestMood ? formatDate(stats.latestMood.entry_date) : 'Start tracking today'}
-                        </p>
-                    </div>
-                </motion.div>
-
-                {/* Journal Counts */}
-                <motion.div variants={item} className="glass-card gpu-accelerated p-6 rounded-3xl premium-shadow border-l-4 border-l-teal-500">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="w-10 h-10 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center dark:bg-teal-500/10 dark:text-teal-400">
-                            <MessageSquare className="w-5 h-5" />
-                        </div>
-                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Activity Log</span>
-                    </div>
-
-                    <div className="space-y-2">
-                        <p className="text-4xl font-black text-foreground tracking-tighter">{stats.journalCount}</p>
-                        <div className="flex items-center gap-2">
-                            <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden max-w-[100px]">
-                                <div className="h-full bg-teal-500 w-1/3" />
-                            </div>
-                            <span className="text-[10px] font-black text-teal-600 uppercase">Streak: Active</span>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* AI Signature Card with Insight Orb */}
-                <motion.div
-                    variants={item}
-                    className="p-6 gpu-accelerated rounded-3xl text-white relative overflow-hidden group premium-shadow md:col-span-2 lg:col-span-1"
-                >
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-teal-700" />
-                    <div className="absolute inset-0 opacity-20 mesh-gradient pointer-events-none" />
-
-                    <div className="relative z-10 h-full flex flex-col justify-between">
-                        <div>
-                            <div className="flex items-center gap-3 mb-4">
-                                <InsightOrb intensity="high" size="sm" />
-                                <span className="font-black text-[10px] uppercase tracking-widest text-emerald-100/80">Neural Pulse</span>
-                            </div>
-                            <p className="text-lg font-bold leading-tight tracking-tight italic">
-                                &quot;Self-reflection is the mirror of the soul&apos;s growth.&quot;
-                            </p>
-                        </div>
-
-                        <Link href="/journal" className="mt-6 flex items-center gap-2 text-[11px] font-black bg-white/20 hover:bg-white/30 backdrop-blur-md w-max px-4 py-2.5 rounded-xl transition-all">
-                            Open Neural Cache <ChevronRight className="w-4 h-4" />
-                        </Link>
-                    </div>
-                </motion.div>
-
-                {/* Emotion Distribution Chart - NEW */}
-                <motion.div variants={item} className="glass-card p-8 rounded-3xl premium-shadow md:col-span-2 lg:col-span-3">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center dark:bg-emerald-500/10 dark:text-emerald-400">
-                            <TrendingUp className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-black text-foreground tracking-tight">Emotional Distribution</h3>
-                            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest mt-0.5">Frequency Analysis</p>
-                        </div>
-                    </div>
-
-                    <div className="h-48 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={stats.emotionData}>
-                                <XAxis
-                                    dataKey="name"
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }}
-                                    dy={10}
-                                />
-                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
-                                <Bar dataKey="count" radius={[4, 4, 4, 4]} isAnimationActive={false}>
-                                    {stats.emotionData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#10b981' : '#14b8a6'} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </motion.div>
-            </motion.div>
-
-            {/* Neural Pulse Breathing Guide */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-                className="mt-8"
-            >
-                <BreathingGuide />
-            </motion.div>
-
-            {/* Recent Reflections Table - Glassmorphic */}
-            <motion.div
-                variants={item}
-                initial="hidden"
-                animate="show"
-                className="space-y-8"
-            >
-                <div className="flex items-end justify-between px-2">
-                    <div className="space-y-1">
-                        <h2 className="text-3xl font-black tracking-tighter text-foreground">Recent Reflections</h2>
-                        <div className="h-1.5 w-12 bg-emerald-600 rounded-full" />
-                    </div>
-                    <Link href="/journal" className="text-emerald-600 font-bold text-sm hover:underline flex items-center gap-1 group">
-                        Explore All <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4">
-                    {stats.recentJournals && stats.recentJournals.length > 0 ? (
-                        stats.recentJournals.map((journal) => (
-                            <motion.div
-                                key={journal.id}
-                                whileHover={{ x: 8 }}
-                                className="glass-card p-6 rounded-[2rem] group flex items-center justify-between transition-all"
-                            >
-                                <div className="flex items-center gap-6">
-                                    <div className="w-14 h-14 bg-emerald-500/5 rounded-[1.5rem] flex items-center justify-center border border-emerald-500/10 group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                                        <BookOpen className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-black text-xl text-foreground tracking-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                            {journal.title || 'Inchoate Entry'}
-                                        </h4>
-                                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
-                                            {formatDate(journal.entry_date)}
-                                        </p>
-                                    </div>
+                        <div className="flex flex-col h-full justify-between gap-8 relative z-10">
+                            <div className="flex items-center justify-between">
+                                <div className="w-12 h-12 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center shadow-sm border border-emerald-500/10">
+                                    <Activity className="w-6 h-6 text-emerald-500" />
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    {journal.has_analysis && (
-                                        <div className="hidden sm:flex items-center gap-1.5 px-4 py-2 bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-500/10">
-                                            <Sparkles className="w-3 h-3" />
-                                            Analyzed
-                                        </div>
-                                    )}
-                                    <Link href={`/journal/${journal.id}`} className="p-4 bg-secondary group-hover:bg-emerald-600 group-hover:text-white rounded-2xl transition-all shadow-sm">
-                                        <ChevronRight className="w-5 h-5" />
-                                    </Link>
-                                </div>
-                            </motion.div>
-                        ))
-                    ) : (
-                        <div className="glass-card p-20 rounded-[3rem] text-center border-dashed border-2">
-                            <div className="w-20 h-20 bg-secondary rounded-[2rem] flex items-center justify-center mx-auto mb-6">
-                                <PlusCircle className="w-10 h-10 text-muted-foreground/30" />
+                                <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Current State</span>
                             </div>
-                            <p className="text-muted-foreground font-bold text-lg">No neural patterns recorded yet.</p>
-                            <Link href="/journal" className="mt-4 text-emerald-600 font-black uppercase text-xs tracking-widest hover:underline block">
-                                Initiate First Session
+
+                            <div>
+                                <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform origin-left duration-300">
+                                    {stats.latestMood?.mood_emoji || '🌱'}
+                                </div>
+                                <h3 className="text-2xl font-black tracking-tight text-foreground capitalize mb-1">
+                                    {stats.latestMood?.mood_label || 'Awaiting Input'}
+                                </h3>
+                                <p className="text-xs font-bold text-muted-foreground flex items-center gap-2">
+                                    <Calendar className="w-3 h-3" />
+                                    {stats.latestMood ? formatDate(stats.latestMood.entry_date) : 'Start your first session today'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* 2. Neural Pulse / Insight - Featured Card (5 cols) */}
+                <motion.div variants={item} className="md:col-span-5 h-full">
+                    <div className="h-full bg-gradient-to-br from-emerald-600 to-teal-800 p-8 rounded-[2.5rem] text-white relative overflow-hidden shadow-2xl shadow-emerald-900/20 group">
+                        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay" />
+                        <div className="absolute top-0 right-0 p-8 opacity-50 group-hover:opacity-100 transition-opacity">
+                            <InsightOrb intensity="high" size="sm" />
+                        </div>
+
+                        <div className="flex flex-col h-full justify-between relative z-10">
+                            <div>
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-black uppercase tracking-widest mb-6">
+                                    <Sparkles className="w-3 h-3" />
+                                    Daily Insight
+                                </div>
+                                <p className="text-xl md:text-2xl font-bold leading-tight tracking-tight italic text-emerald-50 mb-6">
+                                    &quot;In the silence between thoughts, we find our true resonance.&quot;
+                                </p>
+                            </div>
+
+                            <Link href="/journal" className="flex items-center gap-2 group/link w-max text-xs font-black uppercase tracking-widest hover:text-emerald-200 transition-colors">
+                                Open Neural Cache
+                                <ArrowUpRight className="w-4 h-4 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
                             </Link>
                         </div>
-                    )}
-                </div>
+                    </div>
+                </motion.div>
+
+                {/* 3. Quick Stats / Streak (3 cols) */}
+                <motion.div variants={item} className="md:col-span-3 h-full flex flex-col gap-6">
+                    <div className="glass p-6 rounded-[2rem] flex-1 flex flex-col justify-center gap-2 hover:bg-emerald-500/5 transition-colors border border-emerald-500/10">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Streak</span>
+                            <TrendingUp className="w-4 h-4 text-emerald-500" />
+                        </div>
+                        <div className="text-4xl font-black tracking-tighter text-foreground">
+                            {stats.journalCount > 0 ? Math.min(stats.journalCount, 365) : 0}
+                            <span className="text-lg text-muted-foreground ml-1">d</span>
+                        </div>
+                    </div>
+
+                    <div className="glass p-6 rounded-[2rem] flex-1 flex flex-col justify-center gap-2 hover:bg-teal-500/5 transition-colors border border-teal-500/10">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Entries</span>
+                            <BookOpen className="w-4 h-4 text-teal-500" />
+                        </div>
+                        <div className="text-4xl font-black tracking-tighter text-foreground">
+                            {stats.journalCount}
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* 4. Emotional Distribution Chart (8 cols) */}
+                <motion.div variants={item} className="md:col-span-8">
+                    <div className="glass p-8 rounded-[2.5rem] border border-emerald-500/10 h-[300px] flex flex-col">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
+                                    <BarChart className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-black tracking-tight text-foreground">Emotional Distribution</h3>
+                                    <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">Frequency Analysis</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex-1 w-full min-h-0">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={stats.emotionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <XAxis
+                                        dataKey="name"
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600, fontFamily: 'var(--font-inter)' }}
+                                        dy={15}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+                                    <Bar dataKey="count" radius={[6, 6, 6, 6]} barSize={40}>
+                                        {stats.emotionData.map((entry, index) => (
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={index % 2 === 0 ? '#10b981' : '#0d9488'}
+                                                className="transition-all hover:opacity-80 cursor-pointer"
+                                            />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* 5. Recent Activity List (4 cols) */}
+                <motion.div variants={item} className="md:col-span-4 h-full">
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between px-2">
+                            <span className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">Recent Logs</span>
+                            <Link href="/journal" className="p-2 hover:bg-emerald-500/10 rounded-full text-emerald-500 transition-colors">
+                                <ArrowUpRight className="w-4 h-4" />
+                            </Link>
+                        </div>
+
+                        {stats.recentJournals.length > 0 ? (
+                            stats.recentJournals.map((journal) => (
+                                <Link
+                                    href={`/journal/${journal.id}`}
+                                    key={journal.id}
+                                    className="block group"
+                                >
+                                    <div className="glass p-5 rounded-[1.5rem] border border-emerald-500/10 transition-all hover:scale-[1.02] hover:bg-emerald-500/5 hover:border-emerald-500/20">
+                                        <div className="flex items-start justify-between mb-2">
+                                            <div className="bg-background rounded-lg px-2 py-1 text-[10px] font-bold text-muted-foreground border border-black/5 dark:border-white/10">
+                                                {formatDate(journal.entry_date)}
+                                            </div>
+                                            {journal.has_analysis && <Sparkles className="w-3 h-3 text-emerald-500" />}
+                                        </div>
+                                        <h4 className="font-bold text-foreground group-hover:text-emerald-500 transition-colors line-clamp-1">
+                                            {journal.title || 'Untitled Entry'}
+                                        </h4>
+                                    </div>
+                                </Link>
+                            ))
+                        ) : (
+                            <div className="glass p-8 rounded-[2rem] text-center border-dashed border-2 border-emerald-500/10 flex flex-col items-center justify-center gap-3">
+                                <Link href="/journal">
+                                    <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform cursor-pointer">
+                                        <PlusCircle className="w-6 h-6" />
+                                    </div>
+                                </Link>
+                                <span className="text-xs font-medium text-muted-foreground">No entries yet</span>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
             </motion.div>
         </div>
     );
