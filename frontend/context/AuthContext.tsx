@@ -16,34 +16,38 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(() => {
+    const [user, setUser] = useState<User | null>(null);
+    const [sessionID, setSessionID] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
+
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const stored = localStorage.getItem('nl_user');
-            if (stored) return JSON.parse(stored);
-
-            const storedName = localStorage.getItem('nl_gn');
-            if (storedName) {
-                return {
-                    id: 'g-' + Math.random().toString(36).substr(2, 9),
-                    email: 'user@neuroleaf.app',
-                    full_name: storedName,
-                    created_at: new Date().toISOString(),
-                    is_active: true
-                };
+            if (stored) {
+                try {
+                    setUser(JSON.parse(stored));
+                } catch (e) {
+                    console.error("Failed to parse user data", e);
+                }
+            } else {
+                const storedName = localStorage.getItem('nl_gn');
+                if (storedName) {
+                    setUser({
+                        id: 'g-' + Math.random().toString(36).substr(2, 9),
+                        email: 'user@neuroleaf.app',
+                        full_name: storedName,
+                        created_at: new Date().toISOString(),
+                        is_active: true
+                    });
+                }
             }
-        }
-        return null;
-    });
 
-    const [sessionID, setSessionID] = useState<string | null>(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('nl_sid') || 'active_session';
+            const storedSid = localStorage.getItem('nl_sid');
+            setSessionID(storedSid || 'active_session');
+            setIsLoading(false);
         }
-        return 'active_session';
-    });
-
-    const [isLoading] = useState(false);
-    const router = useRouter();
+    }, []);
 
     const login = (authData: AuthResponse) => {
         setUser(authData.user);

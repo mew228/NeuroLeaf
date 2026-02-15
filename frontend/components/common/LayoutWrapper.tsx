@@ -68,7 +68,7 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                 )}
 
                 {!isAuthPage && mounted && user && (
-                    <div className="hidden lg:block w-64 h-full sticky top-0 z-10">
+                    <div className="hidden lg:block w-72 h-screen sticky top-0 z-10">
                         <Sidebar />
                     </div>
                 )}

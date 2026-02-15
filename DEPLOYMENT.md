@@ -31,7 +31,7 @@ After the services are created:
 2. Click **"Environment"** in the sidebar
 3. Add these required variables:
    ```
-   OPENAI_API_KEY = sk-proj-your-openai-api-key
+   OPENAI_API_KEY = your-openai-api-key
    ```
 4. The `DATABASE_URL` and `SECRET_KEY` are auto-generated
 

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '../../context/AuthContext';
 import {
     Home,
@@ -55,12 +56,12 @@ const Sidebar = () => {
     if (!user) return null;
 
     return (
-        <div className="h-full flex flex-col border-r border-emerald-500/10 bg-background/50 backdrop-blur-xl w-64 sticky top-0 scroll-container overflow-y-auto">
+        <div className="h-full flex flex-col border-r border-emerald-500/10 bg-background/50 backdrop-blur-xl shrink-0 scroll-container overflow-y-auto">
             {/* Branding */}
             <div className="p-4 border-b border-emerald-500/10 mb-2 sticky top-0 bg-background/95 backdrop-blur z-10">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                        <Leaf className="text-white w-6 h-6" />
+                    <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 relative overflow-hidden">
+                        <Image src="/logo.png" alt="NeuroLeaf Logo" fill className="object-cover" />
                     </div>
                     <span className="font-bold text-xl tracking-tight">NeuroLeaf</span>
                 </div>

@@ -60,19 +60,21 @@ export default function RootLayout({
             </ToastProvider>
           </AuthProvider>
         </QueryProvider>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('[App] Service Worker registered'))
-                    .catch(err => console.error('[App] SW registration failed:', err));
-                });
-              }
-            `,
-          }}
-        />
+        {process.env.NODE_ENV === 'production' && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                      .then(reg => console.log('[App] Service Worker registered'))
+                      .catch(err => console.error('[App] SW registration failed:', err));
+                  });
+                }
+              `,
+            }}
+          />
+        )}
       </body>
     </html>
   );

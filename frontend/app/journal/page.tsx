@@ -51,7 +51,8 @@ const JournalPage = () => {
     const fetchEntries = async () => {
         setLoadingEntries(true);
         try {
-            const res = await api.get('/journal/entries');
+            // Add timestamp to prevent caching
+            const res = await api.get(`/journal/entries?t=${Date.now()}`);
             setEntries(Array.isArray(res.data) ? res.data : (res.data.entries || []));
         } catch (err) {
             console.error('Failed to fetch entries', err);
