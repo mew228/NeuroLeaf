@@ -15,7 +15,8 @@ import {
     Wind,
     Sparkles,
     Trees,
-    Lock
+    Lock,
+    Activity
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '../../lib/utils';
@@ -31,7 +32,7 @@ const Sidebar = () => {
             items: [
                 { label: 'Neural Hub', href: '/dashboard', icon: Home },
                 { label: 'Cognitive Lab', href: '/cognitive-lab', icon: BookOpen },
-                { label: 'Pattern Mapper', href: '/analytics', icon: BarChart2 },
+                { label: 'Neural Metrics', href: '/analytics', icon: Activity },
                 { label: 'Growth Feed', href: '/growth', icon: Leaf },
             ]
         },
