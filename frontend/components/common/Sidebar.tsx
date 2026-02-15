@@ -7,7 +7,6 @@ import { useAuth } from '../../context/AuthContext';
 import {
     Home,
     BookOpen,
-    BarChart2,
     LifeBuoy,
     LogOut,
     Leaf,

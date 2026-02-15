@@ -5,7 +5,12 @@ import Sidebar from './Sidebar';
 import { useAuth } from '../../context/AuthContext';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, BookOpen, BarChart2, LifeBuoy } from 'lucide-react';
+import {
+    Home,
+    BookOpen,
+    Activity,
+    LifeBuoy,
+} from 'lucide-react';
 import Link from 'next/link';
 import AuraBackground from '../features/AuraBackground';
 import NProgress from 'nprogress';
@@ -107,7 +112,7 @@ const LayoutWrapper = ({ children }: { children: React.ReactNode }) => {
                                         </Link>
                                         <Link href="/analytics" className="flex flex-col items-center gap-1 group">
                                             <div className={`p-2.5 rounded-2xl transition-all ${pathname === '/analytics' ? 'text-emerald-400' : 'text-emerald-500/50'}`}>
-                                                <BarChart2 className="w-6 h-6" />
+                                                <Activity className="w-6 h-6" />
                                             </div>
                                         </Link>
                                     </div>
