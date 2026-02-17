@@ -42,3 +42,4 @@ yarn-debug.log*
 
 # Misc
 next-env.d.ts
+.vercel
