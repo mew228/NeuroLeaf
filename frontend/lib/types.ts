@@ -59,3 +59,25 @@ export interface CrisisResource {
     description: string;
     region?: string;
 }
+
+export type DreamType = 'lucid' | 'nightmare' | 'recurring' | 'prophetic' | 'normal';
+
+export interface DreamEntry {
+    id: string;
+    title: string;
+    description: string;
+    date: string;
+    mood: string;
+    clarity: number; // 1-10
+    lucidityLevel: number; // 1-10
+    type: DreamType;
+    tags: string[];
+    symbols: Array<{
+        name: string;
+        meaning: string;
+    }>;
+    interpretation?: string;
+    imageUrl?: string;
+    audioUrl?: string; // For voice notes
+    created_at: string;
+}

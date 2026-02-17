@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Sparkles,
@@ -11,21 +11,45 @@ import {
     PenTool,
     Calendar,
     ArrowRight,
-    Maximize,
+    Maximize2,
     Mic,
-    StopCircle
+    StopCircle,
+    Search,
+    BookOpen,
+    Filter,
+    BarChart3
 } from 'lucide-react';
 import api from '../../lib/api';
 import { AIAnalysis, JournalEntry } from '../../lib/types';
 import GlassCard from '../../components/common/GlassCard';
 import { formatDate } from '../../lib/utils';
-// import Link from 'next/link';
 import { useToast } from '../../context/ToastContext';
 import FocusMode from '../../components/features/FocusMode';
+import EmotionChart from '../../components/features/EmotionChart';
+
+// Stats Calculation Helper
+const calculateStats = (entries: JournalEntry[]) => {
+    const totalEntries = entries.length;
+    const totalWords = entries.reduce((acc, curr) => acc + (curr.word_count || 0), 0);
+
+    // Calculate emotion distribution
+    const emotionCounts: Record<string, number> = {};
+    entries.forEach(entry => {
+        // Assuming entry has an 'emotion' field or we derive it from analysis if available
+        // If not available in list, we might need to rely on what's there. 
+        // For now, let's mock or use a placeholder if the data isn't directly on the list object
+        // The API response for list might normally not contain full analysis.
+        // If it does, we use it. If not, we skip this part.
+    });
+
+    return { totalEntries, totalWords };
+};
+
+type View = 'write' | 'history';
 
 const JournalPage = () => {
     const { showToast } = useToast();
-    const [view, setView] = useState<'write' | 'history'>('write');
+    const [view, setView] = useState<View>('write');
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [saving, setSaving] = useState(false);
@@ -34,6 +58,7 @@ const JournalPage = () => {
     const [entries, setEntries] = useState<JournalEntry[]>([]);
     const [loadingEntries, setLoadingEntries] = useState(false);
     const [focusModeOpen, setFocusModeOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Voice Journaling State
     const [isRecording, setIsRecording] = useState(false);
@@ -51,7 +76,6 @@ const JournalPage = () => {
     const fetchEntries = async () => {
         setLoadingEntries(true);
         try {
-            // Add timestamp to prevent caching
             const res = await api.get(`/journal/entries?t=${Date.now()}`);
             setEntries(Array.isArray(res.data) ? res.data : (res.data.entries || []));
         } catch (err) {
@@ -78,7 +102,6 @@ const JournalPage = () => {
             mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType });
                 await sendAudioToBackend(audioBlob);
-                // Stop all tracks to release the microphone
                 stream.getTracks().forEach(track => track.stop());
             };
 
@@ -152,286 +175,344 @@ const JournalPage = () => {
         }
     };
 
-    return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-24 lg:pb-0">
-            {/* Header with Toggle */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-4 md:px-0">
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                >
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">
-                        {view === 'write' ? (
-                            <>Write your <span className="text-gradient">truth.</span></>
-                        ) : (
-                            <>Your <span className="text-gradient">Journey.</span></>
-                        )}
-                    </h1>
-                    <p className="text-muted-foreground mt-2 font-medium">
-                        {view === 'write' ? "Neural processing is active. Express yourself freely." : "Reflect on your past entries and insights."}
-                    </p>
-                </motion.div>
+    const filteredEntries = useMemo(() => {
+        return entries.filter(entry =>
+            entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            entry.content.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [entries, searchQuery]);
 
-                <div className="flex items-center gap-3 bg-secondary/50 p-1.5 rounded-2xl border border-white/10">
-                    <button
-                        onClick={() => setView('write')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${view === 'write'
-                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                            : 'text-muted-foreground hover:text-foreground'
-                            }`}
+    const stats = useMemo(() => calculateStats(entries), [entries]);
+
+    return (
+        <div className="max-w-7xl mx-auto space-y-8 pb-20 relative">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-4">
+                <div className="space-y-2 text-center md:text-left">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-widest border border-emerald-500/20"
                     >
-                        <PenTool className="w-4 h-4" />
-                        Write
-                    </button>
-                    <button
-                        onClick={() => setView('history')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${view === 'history'
-                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                            : 'text-muted-foreground hover:text-foreground'
-                            }`}
-                    >
-                        <History className="w-4 h-4" />
-                        History
-                    </button>
+                        <Sparkles className="w-3 h-3" />
+                        Thought Processor
+                    </motion.div>
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground">
+                        Neural Journal
+                    </h1>
+                    <p className="text-muted-foreground text-sm md:text-base max-w-md">
+                        Capture your thoughts, analyze your emotions, and track your mental journey.
+                    </p>
                 </div>
 
-                {/* Focus Mode Toggle */}
-                <button
-                    onClick={() => setFocusModeOpen(true)}
-                    className="hidden md:flex items-center gap-2 px-4 py-3 rounded-xl bg-white/5 hover:bg-emerald-500/20 text-muted-foreground hover:text-emerald-400 font-bold text-sm transition-all border border-white/5 hover:border-emerald-500/20"
-                >
-                    <Maximize className="w-4 h-4" />
-                    Focus
-                </button>
+                {/* Tab Switcher */}
+                <div className="p-1.5 bg-secondary/50 backdrop-blur-md rounded-2xl flex items-center gap-1 border border-white/5">
+                    {[
+                        { id: 'write', icon: PenTool, label: 'Write' },
+                        { id: 'history', icon: BookOpen, label: 'History' },
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setView(tab.id as View)}
+                            className={cn(
+                                "px-6 py-3 rounded-xl flex items-center gap-2 text-sm font-bold transition-all relative overflow-hidden",
+                                view === tab.id
+                                    ? "text-emerald-50 text-shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                            )}
+                        >
+                            {view === tab.id && (
+                                <motion.div
+                                    layoutId="activeView"
+                                    className="absolute inset-0 bg-emerald-500 shadow-lg shadow-emerald-500/25"
+                                    initial={false}
+                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                />
+                            )}
+                            <span className="relative z-10 flex items-center gap-2">
+                                <tab.icon className="w-4 h-4" />
+                                {tab.label}
+                            </span>
+                        </button>
+                    ))}
+                </div>
             </div>
 
             <AnimatePresence mode="wait">
                 {view === 'write' ? (
                     <motion.div
                         key="write"
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="grid lg:grid-cols-3 gap-8 items-start px-4 md:px-0"
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="grid lg:grid-cols-12 gap-8 items-start"
                     >
-                        {/* Editor Space */}
-                        <div className="lg:col-span-2 space-y-6">
-                            <div className="glass-card p-1 rounded-[2.5rem] overflow-hidden focus-within:ring-4 focus-within:ring-emerald-500/20 transition-all duration-500 relative">
+                        {/* Editor Area */}
+                        <div className="lg:col-span-8 space-y-6">
+                            <div className="glass-card p-1 rounded-[2.5rem] overflow-hidden group focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all duration-500 relative bg-gradient-to-br from-white/5 to-white/0">
                                 <input
                                     type="text"
-                                    placeholder="Atmospheric Title..."
+                                    placeholder="Title your entry..."
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className="w-full bg-transparent p-8 text-3xl font-black tracking-tight border-none focus:outline-none placeholder:text-muted-foreground/30 text-foreground"
+                                    className="w-full bg-transparent p-8 pb-4 text-3xl font-black tracking-tight border-none focus:outline-none placeholder:text-muted-foreground/30 text-foreground"
                                 />
-                                <div className="h-px bg-emerald-500/10 mx-8" />
+                                <div className="h-px bg-gradient-to-r from-transparent via-emerald-500/10 to-transparent mx-8" />
                                 <textarea
-                                    placeholder="Let your thoughts flow into the neural void..."
+                                    placeholder="What's on your mind today?"
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
-                                    rows={15}
-                                    className="w-full bg-transparent p-8 text-xl font-medium leading-relaxed border-none focus:outline-none resize-none placeholder:text-muted-foreground/30 text-foreground/80 focus:ring-0"
+                                    rows={16}
+                                    className="w-full bg-transparent p-8 text-lg md:text-xl font-medium leading-relaxed border-none focus:outline-none resize-none placeholder:text-muted-foreground/30 text-foreground/80 focus:ring-0 custom-scrollbar"
                                 />
-                                <div className="p-6 bg-emerald-50/50 dark:bg-emerald-950/20 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-                                    <div className="flex items-center gap-4">
-                                        <span>Chars: {content.length}</span>
-                                        <span>Words: {content.match(/\S+/g)?.length || 0}</span>
+
+                                {/* Status Bar */}
+                                <div className="px-8 py-4 bg-emerald-950/20 border-t border-white/5 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.1em] text-muted-foreground">
+                                    <div className="flex items-center gap-6">
+                                        <span>{content.length} Chars</span>
+                                        <span>{content.match(/\S+/g)?.length || 0} Words</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                                        Neural Sync Active
+                                    <div className="flex items-center gap-2 text-emerald-500/70">
+                                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                        Auto-Sync Ready
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex justify-end gap-4">
-                                <button
-                                    onClick={isRecording ? stopRecording : startRecording}
-                                    disabled={transcribing || saving}
-                                    className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-black transition-all active:scale-95 shadow-xl ${isRecording
-                                        ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/30 animate-pulse'
-                                        : 'bg-white/5 hover:bg-emerald-500/10 text-muted-foreground hover:text-emerald-400 border border-white/5 hover:border-emerald-500/20 shadow-black/20'
-                                        }`}
-                                >
-                                    {transcribing ? (
-                                        <div className="w-5 h-5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-                                    ) : isRecording ? (
-                                        <StopCircle className="w-5 h-5" />
-                                    ) : (
-                                        <Mic className="w-5 h-5" />
-                                    )}
-                                    {transcribing ? 'Transcribing...' : isRecording ? 'Stop Sync' : 'Voice Journal'}
-                                </button>
+                            {/* Actions Toolbar */}
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                    <button
+                                        onClick={isRecording ? stopRecording : startRecording}
+                                        disabled={transcribing || saving}
+                                        className={`flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all active:scale-95 shadow-lg border ${isRecording
+                                            ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 hover:bg-rose-500/20'
+                                            : 'bg-secondary/50 text-muted-foreground hover:text-emerald-400 border-white/5 hover:bg-emerald-500/10 hover:border-emerald-500/20'
+                                            }`}
+                                    >
+                                        {transcribing ? (
+                                            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                        ) : isRecording ? (
+                                            <StopCircle className="w-5 h-5 animate-pulse" />
+                                        ) : (
+                                            <Mic className="w-5 h-5" />
+                                        )}
+                                        <span className="md:hidden lg:inline">{transcribing ? 'Processing...' : isRecording ? 'Stop Recording' : 'Voice Note'}</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => setFocusModeOpen(true)}
+                                        className="p-4 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-emerald-400 border border-white/5 hover:bg-emerald-500/10 hover:border-emerald-500/20 transition-all active:scale-95"
+                                        title="Enter Focus Mode"
+                                    >
+                                        <Maximize2 className="w-5 h-5" />
+                                    </button>
+                                </div>
 
                                 <button
                                     onClick={handleSave}
                                     disabled={saving || !title || !content || isRecording}
-                                    className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-8 py-4 rounded-2xl font-black transition-all active:scale-95 shadow-xl shadow-emerald-500/30"
+                                    className="w-full sm:w-auto flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-4 rounded-2xl font-black transition-all active:scale-95 shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40"
                                 >
                                     {saving ? (
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                     ) : (
-                                        <Sparkles className="w-5 h-5" />
+                                        <BrainCircuit className="w-5 h-5" />
                                     )}
-                                    {saving ? 'Processing...' : 'Sync to Neural Cache'}
+                                    {saving ? 'Analyzing...' : 'Save & Analyze'}
                                 </button>
                             </div>
                         </div>
 
                         {/* Analysis Sidebar */}
-                        <div className="space-y-6">
-                            {analyzing && (
-                                <GlassCard className="flex flex-col items-center text-center space-y-6 animate-pulse p-10">
-                                    <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center">
-                                        <BrainCircuit className="w-8 h-8 text-emerald-600 animate-bounce" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-black tracking-tight text-foreground">Scanning Essence</h3>
-                                        <p className="text-sm text-muted-foreground font-medium mt-2">Our AI is deciphering the emotional subtext of your entry...</p>
-                                    </div>
-                                </GlassCard>
-                            )}
-
-                            {analysis && !analyzing && (
-                                <motion.div
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="space-y-6"
-                                >
-                                    {/* Reflection Card */}
-                                    <GlassCard className="pb-12 text-foreground relative overflow-hidden" gradientBorder="emerald">
-                                        <div className="absolute top-0 right-0 p-8">
-                                            <Sparkles className="w-10 h-10 text-emerald-500/20" />
+                        <div className="lg:col-span-4 space-y-6">
+                            <AnimatePresence mode="wait">
+                                {analyzing ? (
+                                    <GlassCard className="flex flex-col items-center text-center space-y-6 animate-pulse p-12 border-emerald-500/30">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full animate-pulse" />
+                                            <BrainCircuit className="w-12 h-12 text-emerald-500 relative z-10 animate-bounce" />
                                         </div>
-
-                                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 mb-6">Neural Insight</h3>
-                                        <p className="text-2xl font-black italic tracking-tight leading-snug">
-                                            &quot;{analysis.ai_reflection}&quot;
-                                        </p>
-                                    </GlassCard>
-
-                                    {/* Metrics Grid */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <GlassCard className="p-6">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Sentiment</span>
-                                            <p className="text-xl font-black text-emerald-600 mt-1 capitalize truncate">{analysis.sentiment.label}</p>
-                                        </GlassCard>
-                                        <GlassCard className="p-6">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Primary</span>
-                                            <p className="text-xl font-black text-emerald-600 mt-1 capitalize truncate">{analysis.emotions.primary}</p>
-                                        </GlassCard>
-                                    </div>
-
-                                    {/* Stress Indicator */}
-                                    <GlassCard className="p-8">
-                                        <div className="flex items-center justify-between mb-6">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Stress Level</span>
-                                            <div className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${analysis.stress.level === 'low' ? 'bg-emerald-500/10 text-emerald-600' :
-                                                analysis.stress.level === 'medium' ? 'bg-amber-500/10 text-amber-600' :
-                                                    'bg-rose-500/10 text-rose-600'
-                                                }`}>
-                                                {analysis.stress.level}
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {analysis.stress.keywords.map((kw, i) => (
-                                                <span key={i} className="text-xs font-bold text-muted-foreground bg-secondary px-3 py-1.5 rounded-xl">
-                                                    #{kw}
-                                                </span>
-                                            ))}
+                                        <div>
+                                            <h3 className="text-xl font-black tracking-tight text-foreground">Scanning Essence</h3>
+                                            <p className="text-sm text-muted-foreground font-medium mt-2">
+                                                Decoding emotional patterns and extracting insights...
+                                            </p>
                                         </div>
                                     </GlassCard>
-
-                                    {analysis.crisis_detected && (
-                                        <div className="p-6 bg-rose-500/10 border border-rose-500/20 rounded-[2rem] flex items-start gap-3">
-                                            <AlertTriangle className="w-6 h-6 text-rose-500 flex-shrink-0" />
-                                            <div>
-                                                <h4 className="font-bold text-rose-500 text-sm">Action Required</h4>
-                                                <p className="text-xs text-rose-600/80 mt-1 leading-relaxed font-medium">
-                                                    Our AI detected signs of significant distress. We recommend connecting with support resources.
-                                                </p>
+                                ) : analysis ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="space-y-6"
+                                    >
+                                        {/* Insight Card */}
+                                        <GlassCard className="p-8 relative overflow-hidden" gradientBorder="emerald">
+                                            <div className="absolute top-0 right-0 p-6 opacity-50">
+                                                <Sparkles className="w-12 h-12 text-emerald-500/10" />
                                             </div>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            )}
 
-                            {!analysis && !analyzing && (
-                                <GlassCard className="border-dashed border-2 flex flex-col items-center text-center space-y-4 p-10">
-                                    <div className="w-14 h-14 bg-secondary rounded-2xl flex items-center justify-center">
-                                        <Zap className="w-7 h-7 text-muted-foreground/30" />
-                                    </div>
-                                    <p className="text-sm text-muted-foreground font-bold tracking-tight px-4">
-                                        Write and sync your entry to receive an AI neural analysis of your emotional state.
-                                    </p>
-                                </GlassCard>
-                            )}
+                                            <div className="flex items-center gap-2 mb-6">
+                                                <div className="p-2 rounded-lg bg-emerald-500/10">
+                                                    <Zap className="w-4 h-4 text-emerald-500" />
+                                                </div>
+                                                <span className="text-xs font-black uppercase tracking-widest text-emerald-600">Core Insight</span>
+                                            </div>
+
+                                            <p className="text-xl font-bold italic leading-relaxed text-foreground/90">
+                                                &quot;{analysis.ai_reflection}&quot;
+                                            </p>
+                                        </GlassCard>
+
+                                        {/* Metrics Grid */}
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <GlassCard className="p-5 flex flex-col justify-between h-32 hover-effect">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Mood</span>
+                                                <div>
+                                                    <div className="text-2xl font-black text-emerald-500 mb-1 capitalize truncate">{analysis.sentiment.label}</div>
+                                                    <div className="w-full h-1 bg-emerald-500/20 rounded-full overflow-hidden">
+                                                        <div className="h-full bg-emerald-500" style={{ width: `${Math.abs(analysis.sentiment.score * 100)}%` }} />
+                                                    </div>
+                                                </div>
+                                            </GlassCard>
+
+                                            <GlassCard className="p-5 flex flex-col justify-between h-32 hover-effect">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Emotion</span>
+                                                <div className="text-2xl font-black text-emerald-500 capitalize truncate">{analysis.emotions.primary}</div>
+                                            </GlassCard>
+                                        </div>
+
+                                        {/* Stress Level */}
+                                        <GlassCard className="p-6 flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-3 h-3 rounded-full ${analysis.stress.level === 'low' ? 'bg-emerald-500' : analysis.stress.level === 'medium' ? 'bg-amber-500' : 'bg-rose-500'}`} />
+                                                <span className="text-sm font-bold capitalize">{analysis.stress.level} Stress</span>
+                                            </div>
+                                            <span className="text-xs text-muted-foreground font-mono">
+                                                {analysis.stress.level === 'low' ? 'Optimal' : 'Elevated'}
+                                            </span>
+                                        </GlassCard>
+
+                                        {analysis.crisis_detected && (
+                                            <div className="p-6 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex items-start gap-4">
+                                                <AlertTriangle className="w-6 h-6 text-rose-500 flex-shrink-0" />
+                                                <div>
+                                                    <h4 className="font-bold text-rose-500 text-sm">Action Required</h4>
+                                                    <p className="text-xs text-rose-400 mt-1 leading-relaxed">
+                                                        We've detected signs of distress. Please consider reaching out to a professional or trusted contact.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                ) : (
+                                    <GlassCard className="h-full min-h-[400px] border-dashed border-2 flex flex-col items-center justify-center text-center p-12 space-y-6 opacity-60 hover:opacity-100 transition-opacity">
+                                        <div className="w-20 h-20 bg-emerald-500/5 rounded-full flex items-center justify-center">
+                                            <BrainCircuit className="w-10 h-10 text-emerald-500/30" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-lg text-foreground">Awaiting Input</h3>
+                                            <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
+                                                Your journal entry will be analyzed for sentiment, emotion, and stress indicators.
+                                            </p>
+                                        </div>
+                                    </GlassCard>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </motion.div>
                 ) : (
                     <motion.div
                         key="history"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 md:px-0"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-8"
                     >
-                        {loadingEntries ? (
-                            Array.from({ length: 6 }).map((_, i) => (
-                                <GlassCard key={i} className="h-64 animate-pulse flex flex-col justify-between">
-                                    <div className="space-y-4">
-                                        <div className="w-1/3 h-4 bg-secondary rounded-full" />
-                                        <div className="w-3/4 h-6 bg-secondary rounded-lg" />
-                                        <div className="w-full h-20 bg-secondary rounded-lg" />
-                                    </div>
-                                    <div className="w-1/2 h-4 bg-secondary rounded-full" />
-                                </GlassCard>
-                            ))
-                        ) : entries.length > 0 ? (
-                            entries.map((entry) => (
-                                <GlassCard key={entry.id} className="group hover:border-emerald-500/30 cursor-pointer flex flex-col h-full" hoverEffect={true}>
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                                            <Calendar className="w-3 h-3" />
-                                            {formatDate(entry.entry_date)}
-                                        </div>
-                                    </div>
-
-                                    <h3 className="text-xl font-black text-foreground mb-3 line-clamp-1 group-hover:text-emerald-600 transition-colors">
-                                        {entry.title}
-                                    </h3>
-                                    <p className="text-muted-foreground text-sm font-medium line-clamp-3 mb-6 flex-1 px-1">
-                                        {entry.content}
-                                    </p>
-
-                                    <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                                        <span className="text-[10px] font-black uppercase text-emerald-600 bg-emerald-500/10 px-3 py-1 rounded-full">
-                                            {entry.word_count} Words
-                                        </span>
-                                        <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-1 transition-transform group-hover:text-emerald-600" />
-                                    </div>
-                                </GlassCard>
-                            ))
-                        ) : (
-                            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
-                                <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mb-6">
-                                    <PenTool className="w-8 h-8 text-muted-foreground/30" />
-                                </div>
-                                <h3 className="text-2xl font-black text-foreground">No entries found</h3>
-                                <p className="text-muted-foreground font-medium mt-2 mb-8">Start writing your first entry to populate your history.</p>
-                                <button
-                                    onClick={() => setView('write')}
-                                    className="px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 transition-all"
-                                >
-                                    Start Writing
-                                </button>
+                        {/* Search & Stats Bar */}
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="relative">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                                <input
+                                    type="text"
+                                    placeholder="Search entries..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full bg-secondary/30 border border-white/5 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:bg-secondary/50 focus:border-emerald-500/30 transition-all font-medium"
+                                />
                             </div>
-                        )}
+                            <div className="flex gap-4">
+                                <GlassCard className="flex-1 p-4 flex items-center justify-between">
+                                    <span className="text-xs text-muted-foreground uppercase font-black tracking-widest">Total Entries</span>
+                                    <span className="text-xl font-black text-emerald-500">{stats.totalEntries}</span>
+                                </GlassCard>
+                                <GlassCard className="flex-1 p-4 flex items-center justify-between">
+                                    <span className="text-xs text-muted-foreground uppercase font-black tracking-widest">Words</span>
+                                    <span className="text-xl font-black text-emerald-500">{stats.totalWords}</span>
+                                </GlassCard>
+                            </div>
+                        </div>
+
+                        {/* Recent Entries Grid */}
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {loadingEntries ? (
+                                Array.from({ length: 6 }).map((_, i) => (
+                                    <GlassCard key={i} className="h-64 animate-pulse p-6">
+                                        <div className="space-y-4 h-full flex flex-col">
+                                            <div className="w-1/3 h-4 bg-emerald-500/10 rounded-full" />
+                                            <div className="w-3/4 h-8 bg-emerald-500/10 rounded-lg" />
+                                            <div className="flex-1 bg-emerald-500/5 rounded-xl" />
+                                        </div>
+                                    </GlassCard>
+                                ))
+                            ) : filteredEntries.length > 0 ? (
+                                filteredEntries.map((entry) => (
+                                    <GlassCard key={entry.id} className="group cursor-pointer flex flex-col h-full min-h-[280px]" hoverEffect={true} gradientBorder="emerald">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-3 py-1.5 rounded-full">
+                                                <Calendar className="w-3 h-3" />
+                                                {formatDate(entry.entry_date)}
+                                            </div>
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500/50 group-hover:bg-emerald-400 transition-colors" />
+                                        </div>
+
+                                        <h3 className="text-xl font-black text-foreground mb-3 line-clamp-2 group-hover:text-emerald-400 transition-colors">
+                                            {entry.title}
+                                        </h3>
+
+                                        <p className="text-muted-foreground text-sm font-medium leading-relaxed line-clamp-4 mb-6 flex-1">
+                                            {entry.content}
+                                        </p>
+
+                                        <div className="flex items-center justify-between pt-6 border-t border-white/5 mt-auto">
+                                            <span className="text-xs font-bold text-muted-foreground">
+                                                {entry.word_count || 0} words
+                                            </span>
+                                            <div className="flex items-center gap-2 text-xs font-bold text-emerald-500 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-0 translate-x-4">
+                                                Read Entry <ArrowRight className="w-3 h-3" />
+                                            </div>
+                                        </div>
+                                    </GlassCard>
+                                ))
+                            ) : (
+                                <div className="col-span-full py-20 text-center">
+                                    <div className="w-24 h-24 bg-gradient-to-br from-secondary to-transparent rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <Search className="w-10 h-10 text-muted-foreground/30" />
+                                    </div>
+                                    <h3 className="text-2xl font-black text-foreground mb-2">No entries found</h3>
+                                    <p className="text-muted-foreground">
+                                        {searchQuery ? "Try adjusting your search terms." : "Start writing to populate your journal."}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Neural Void Focus Mode */}
+            {/* Focus Mode Overlay */}
             <FocusMode
                 isOpen={focusModeOpen}
                 onClose={() => setFocusModeOpen(false)}
@@ -449,5 +530,10 @@ const JournalPage = () => {
         </div>
     );
 };
+
+// Simplified cn helper
+function cn(...classes: any[]) {
+    return classes.filter(Boolean).join(' ');
+}
 
 export default JournalPage;
