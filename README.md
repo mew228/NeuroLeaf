@@ -53,7 +53,7 @@ npm install
 npm run dev
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000).
+The app will be available at [https://neuroleaf.vercel.app](https://neuroleaf.vercel.app).
 
 ## 📱 Mobile-First Design
 NeuroLeaf features a custom-built mobile navigation bar with a central FAB (Floating Action Button) for instant mood logging. Every component is optimized for touch interaction and high-performance rendering on mobile GPUs.
